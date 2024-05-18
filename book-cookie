@@ -1,0 +1,92 @@
+//index.html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Books</title>
+</head>
+<body>
+    <h1>Select Books</h1>
+    <form action="books" method="post">
+        <input type="checkbox" name="book" value="The Great Gatsby"> The Great Gatsby<br>
+        <input type="checkbox" name="book" value="1984"> 1984<br>
+        <input type="checkbox" name="book" value="To Kill a Mockingbird"> To Kill a Mockingbird<br>
+        <input type="checkbox" name="book" value="Moby Dick"> Moby Dick<br>
+        <input type="checkbox" name="book" value="Pride and Prejudice"> Pride and Prejudice<br>
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
+
+
+
+
+
+
+//books.java
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
+
+@WebServlet("/books")
+public class BookServlet extends HttpServlet {
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String[] selectedBooks = request.getParameterValues("book");
+
+        if (selectedBooks != null) {
+            String books = String.join(",", selectedBooks);
+            Cookie booksCookie = new Cookie("selectedBooks", books);
+            booksCookie.setMaxAge(60 * 60); // 1 hour
+            response.addCookie(booksCookie);
+        }
+
+        response.sendRedirect("selectedBooks");
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Cookie[] cookies = request.getCookies();
+        String selectedBooks = null;
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("selectedBooks".equals(cookie.getName())) {
+                    selectedBooks = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        out.println("<!DOCTYPE html>");
+        out.println("<html>");
+        out.println("<head>");
+        out.println("<title>Selected Books</title>");
+        out.println("</head>");
+        out.println("<body>");
+        out.println("<h1>Selected Books</h1>");
+
+        if (selectedBooks != null) {
+            String[] booksArray = selectedBooks.split(",");
+            out.println("<ul>");
+            for (String book : booksArray) {
+                out.println("<li>" + book + "</li>");
+            }
+            out.println("</ul>");
+        } else {
+            out.println("<p>No books selected.</p>");
+        }
+
+        out.println("</body>");
+        out.println("</html>");
+    }
+}
