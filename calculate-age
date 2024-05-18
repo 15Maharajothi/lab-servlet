@@ -1,0 +1,58 @@
+//index.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Age Calculator</title>
+</head>
+<body>
+    <h2>Age Calculator</h2>
+    <form action="AgeCalculatorServlet" method="post">
+        <label for="dob">Date of Birth:</label>
+        <input type="date" id="dob" name="dob" required><br><br>
+        
+        <button type="submit">Calculate Age</button>
+    </form>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+  //AgeCalculatorServlet.java
+
+
+
+  import java.io.IOException;
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.time.Period;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/AgeCalculatorServlet")
+public class AgeCalculatorServlet extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String dobStr = request.getParameter("dob");
+        LocalDate dob = LocalDate.parse(dobStr);
+        LocalDate currentDate = LocalDate.now();
+        
+        int age = Period.between(dob, currentDate).getYears();
+        
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        out.println("<html><body>");
+        out.println("<h2>Age Calculation Result</h2>");
+        out.println("<p>Date of Birth: " + dob + "</p>");
+        out.println("<p>Current Date: " + currentDate + "</p>");
+        out.println("<p>Age: " + age + " years</p>");
+        out.println("</body></html>");
+    }
+}
