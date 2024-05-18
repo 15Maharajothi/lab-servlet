@@ -1,0 +1,100 @@
+//index.html
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Movies</title>
+</head>
+<body>
+    <h1>Select Movies</h1>
+    <form action="movies" method="post">
+        <input type="checkbox" name="movie" value="Inception"> Inception<br>
+        <input type="checkbox" name="movie" value="The Matrix"> The Matrix<br>
+        <input type="checkbox" name="movie" value="Interstellar"> Interstellar<br>
+        <input type="checkbox" name="movie" value="The Dark Knight"> The Dark Knight<br>
+        <input type="checkbox" name="movie" value="Pulp Fiction"> Pulp Fiction<br>
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+//movies.java
+
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
+
+@WebServlet("/movies")
+public class MovieServlet extends HttpServlet {
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String[] selectedMovies = request.getParameterValues("movie");
+
+        if (selectedMovies != null) {
+            String movies = String.join(",", selectedMovies);
+            Cookie moviesCookie = new Cookie("selectedMovies", movies);
+            moviesCookie.setMaxAge(60 * 60); // 1 hour
+            response.addCookie(moviesCookie);
+        }
+
+        response.sendRedirect("selectedMovies");
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Cookie[] cookies = request.getCookies();
+        String selectedMovies = null;
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("selectedMovies".equals(cookie.getName())) {
+                    selectedMovies = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        out.println("<!DOCTYPE html>");
+        out.println("<html>");
+        out.println("<head>");
+        out.println("<title>Selected Movies</title>");
+        out.println("</head>");
+        out.println("<body>");
+        out.println("<h1>Selected Movies</h1>");
+
+        if (selectedMovies != null) {
+            String[] moviesArray = selectedMovies.split(",");
+            out.println("<ul>");
+            for (String movie : moviesArray) {
+                out.println("<li>" + movie + "</li>");
+            }
+            out.println("</ul>");
+        } else {
+            out.println("<p>No movies selected.</p>");
+        }
+
+        out.println("</body>");
+        out.println("</html>");
+    }
+}
+
