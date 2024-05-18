@@ -1,0 +1,80 @@
+//index.html
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <form action="calculategross" method="post">
+            <h1>Employee Gross Salary Calculator</h1>
+            <label>Name:</label><br> 
+            <input type="text" name="name" id="name"><br><br> 
+            <label>Employee id :</label><br> 
+            <input type="text" name="employeeid" id="employeeid"><br> <br> 
+            <label>Basic pay: </label><br> 
+            <input type="text" name="basicpay" id="bsicpay"><br> <br> 
+            <label>Hra (in percentage):</label><br> 
+            <input type="text" name="hra" id="hra"> <br> <br> 
+            <button type="submit">calculate</button>
+        </form>
+    </body>
+</html>
+
+
+
+
+
+
+
+
+
+//calculategross.java
+
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+
+@WebServlet(urlPatterns = {"/calculategross"})
+public class calculategross extends HttpServlet {
+
+   
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        
+        String name = request.getParameter("name");
+        String employeeid = request.getParameter("employeeid");
+        double basicpay = Double.parseDouble(request.getParameter("basicpay"));
+        double hra = Double.parseDouble(request.getParameter("hra"));
+        
+        double hramount = (hra/100)*basicpay;
+        double grossamount = hramount +basicpay;
+        
+        
+        try (PrintWriter out = response.getWriter()) {
+           
+            out.println("<!DOCTYPE html>");
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Servlet calculategross</title>");            
+            out.println("</head>");
+            out.println("<body>");
+            out.println("<h1>Servlet calculategross at " + request.getContextPath() + "</h1>");
+            out.println("<p>Name :"+name +"</p>");
+            out.println("<p>Employee Id : " +employeeid+"</p>");
+            out.println("<p>Grossamount "+grossamount +"<p>");
+            out.println("</body>");
+            out.println("</html>");
+        }
+    }
+}
+    
+
+
